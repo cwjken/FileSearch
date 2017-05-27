@@ -48,16 +48,18 @@ class FileSearch
         if ($readfd === false || $writefd === false) {
             return false;
         }
-        echo "\n start reformat file $this->filename ..";
+        echo "\n start reformat file $this->filename ..<br />";
         while (!feof($readfd)) {
             $line = fgets($readfd, 8192);
-            fwrite($writefd, pack("a".$this->maxLength, $line));
+            fwrite($writefd, pack("a".$this->maxLength, $line));     //生成一个每行有数量相等字节的二进制文件
         }
         echo "\n reformat ok\n";
         fclose($readfd);
         fclose($writefd);
         rename($this->formatFile.'_tmp', $this->formatFile);
     }
+
+
     /**
      * 在索引文件中进行二分查找
      * @param  int $id    进行二分查找的id
@@ -65,16 +67,17 @@ class FileSearch
      */
     public function search($key)
     {
-        $filesize = filesize($this->formatFile);
+        $filesize = filesize($this->formatFile);                   //文件大小多少字节
         $fd = fopen($this->formatFile, "rb");
         $left = 0; //行号
-        $right = ($filesize / $this->maxLength) - 1; //行号
+        $right = ($filesize / $this->maxLength) - 1;               //总共有多少行，总字节数除以每一行字节数，因为从0开始所以减1
 
-        while ($left <= $right) {
-            $middle = intval(($right + $left)/2);
-            fseek($fd, ($middle) * $this->maxLength);
-            $info = unpack("a*", fread($fd, $this->maxLength))['1'];
-            $lineinfo = explode("\t", $info, 2);
+        while ($left <= $right) {                                   
+            $middle = intval(($right + $left)/2);                  //取出中间行数（整数）
+            fseek($fd, ($middle) * $this->maxLength);              //把指针移动到中那行
+            $info = unpack("a*", fread($fd, $this->maxLength))['1'];//解压缩二进制文件
+
+            $lineinfo = explode("\t", $info, 2);                     //获取序号和值
             if ($lineinfo['0'] > $key) {
                 $right = $middle - 1;
             } elseif ($lineinfo['0'] < $key) {

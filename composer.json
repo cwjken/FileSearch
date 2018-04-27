@@ -1,0 +1,14 @@
+{
+    "name": "cwjken/filesearch",
+    "description": "a test",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "weijian chen",
+            "email": "781263067@qq.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}
